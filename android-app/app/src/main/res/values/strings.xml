@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">VéloTrainer D100</string>
+    <string name="title_power">PUISSANCE</string>
+    <string name="title_cadence">CADENCE</string>
+    <string name="title_speed">VITESSE</string>
+    <string name="title_gear">VITESSE VIRTUELLE</string>
+    <string name="title_erg">MODE ERG</string>
+    <string name="btn_connect">Connecter Home Trainer</string>
+    <string name="btn_start">Démarrer</string>
+    <string name="btn_pause">Pause</string>
+    <string name="btn_reset">Réinitialiser</string>
+</resources>

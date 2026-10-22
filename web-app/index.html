@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>VéloTrainer - Van Rysel D100 (TV & Smartphone)</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="theme-dark">
+    <!-- Barre Supérieure / En-tête -->
+    <header class="top-bar">
+        <div class="brand-group">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="5.5" cy="17.5" r="3.5"/>
+                    <circle cx="18.5" cy="17.5" r="3.5"/>
+                    <path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5L9 9l3-3 4 3"/>
+                    <path d="M12 9l3.5 8.5"/>
+                </svg>
+            </div>
+            <div class="brand-text">
+                <span class="brand-name">VÉLOTRAINER</span>
+                <span class="brand-badge">VAN RYSEL D100</span>
+            </div>
+        </div>
+
+        <!-- Statut de Connexion BLE et Boutons d'Action -->
+        <div class="connection-status-group">
+            <button id="btnToggle3D" class="btn btn-race" title="Basculer vers le Monde 3D & Course" tabindex="1">
+                <span class="race-icon">🏁</span> Course 3D & Décors TV
+            </button>
+
+            <button id="btnConnect" class="btn btn-connect" tabindex="2">
+                <span class="status-indicator disconnected" id="bleIndicator"></span>
+                <span id="bleStatusText">Connecter Home Trainer</span>
+            </button>
+
+            <button id="btnDemo" class="btn btn-secondary" title="Tester sans home trainer" tabindex="3">
+                <span class="demo-icon">🎮</span> Mode Démo
+            </button>
+
+            <button id="btnFullscreen" class="btn btn-icon" title="Plein écran (Idéal TV)" tabindex="4">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Zone Principale -->
+    <main class="dashboard-container">
+        
+        <!-- Ruban des Modes d'Entraînement -->
+        <section class="mode-selector-bar">
+            <button class="mode-btn active" data-mode="gear" id="tabModeGear" tabindex="5">
+                <span class="mode-icon">⚙️</span>
+                <span class="mode-title">Vitesses Virtuelles</span>
+                <span class="mode-sub">Zwift Cog (24 Vitesses)</span>
+            </button>
+            <button class="mode-btn" data-mode="erg" id="tabModeErg" tabindex="6">
+                <span class="mode-icon">⚡</span>
+                <span class="mode-title">Mode ERG</span>
+                <span class="mode-sub">Puissance Cible Constante</span>
+            </button>
+            <button class="mode-btn" data-mode="sim" id="tabModeSim" tabindex="7">
+                <span class="mode-icon">⛰️</span>
+                <span class="mode-title">Simulation Pente</span>
+                <span class="mode-sub">Pente 0% à +6% max</span>
+            </button>
+            <button class="mode-btn" data-mode="workout" id="tabModeWorkout" tabindex="8">
+                <span class="mode-icon">⏱️</span>
+                <span class="mode-title">Entraînements</span>
+                <span class="mode-sub">HIIT, Seuil, Endurance</span>
+            </button>
+        </section>
+
+        <!-- Bandeau d'intervalle actif (si workout) -->
+        <div id="workoutProgressContainer" class="workout-progress-container hidden">
+            <div class="workout-info-row">
+                <span id="workoutIntervalTitle" class="interval-title">Intervalle 1/6 : Échauffement</span>
+                <span id="workoutIntervalTime" class="interval-timer">02:45 restant</span>
+            </div>
+            <div class="workout-progress-bar-bg">
+                <div id="workoutProgressBar" class="workout-progress-bar-fill" style="width: 35%;"></div>
+            </div>
+        </div>
+
+        <!-- GRILLE DE TÉLÉMÉTRIE GÉANTE (Optimisée 10-foot TV et Mobile) -->
+        <section class="telemetry-grid">
+            
+            <!-- Carte 1 : PUISSANCE (Watts) -->
+            <div class="telemetry-card card-power" id="cardPower">
+                <div class="card-header">
+                    <span class="card-title">PUISSANCE</span>
+                    <span class="card-badge" id="powerZoneBadge">Zone 2 - Endurance</span>
+                </div>
+                <div class="card-main-val">
+                    <span class="number-display" id="valPower">0</span>
+                    <span class="unit-display">W</span>
+                </div>
+                <div class="card-sub-info">
+                    <div class="sub-item">
+                        <span class="sub-label">Moyenne</span>
+                        <span class="sub-val" id="valAvgPower">0 W</span>
+                    </div>
+                    <div class="sub-item">
+                        <span class="sub-label">Max</span>
+                        <span class="sub-val" id="valMaxPower">0 W</span>
+                    </div>
+                    <div class="sub-item">
+                        <span class="sub-label">W/kg</span>
+                        <span class="sub-val" id="valWkg">0.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carte 2 : CADENCE (RPM) -->
+            <div class="telemetry-card card-cadence">
+                <div class="card-header">
+                    <span class="card-title">CADENCE</span>
+                    <span class="card-badge" id="cadenceStatusBadge">Normal</span>
+                </div>
+                <div class="card-main-val">
+                    <span class="number-display" id="valCadence">0</span>
+                    <span class="unit-display">RPM</span>
+                </div>
+                <div class="card-sub-info">
+                    <div class="sub-item">
+                        <span class="sub-label">Moyenne</span>
+                        <span class="sub-val" id="valAvgCadence">0 RPM</span>
+                    </div>
+                    <div class="sub-item">
+                        <span class="sub-label">Max</span>
+                        <span class="sub-val" id="valMaxCadence">0 RPM</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carte 3 : VITESSE ESTIMÉE (km/h) -->
+            <div class="telemetry-card card-speed">
+                <div class="card-header">
+                    <span class="card-title">VITESSE</span>
+                    <span class="card-badge">Distance: <strong id="valDistance">0.0</strong> km</span>
+                </div>
+                <div class="card-main-val">
+                    <span class="number-display" id="valSpeed">0.0</span>
+                    <span class="unit-display">KM/H</span>
+                </div>
+                <div class="card-sub-info">
+                    <div class="sub-item">
+                        <span class="sub-label">Moyenne</span>
+                        <span class="sub-val" id="valAvgSpeed">0.0 km/h</span>
+                    </div>
+                    <div class="sub-item">
+                        <span class="sub-label">Calories</span>
+                        <span class="sub-val" id="valCalories">0 kcal</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carte 4 : COMMANDE ACTIVE (Vitesse Virtuelle / Watts Cibles / Pente) -->
+            <div class="telemetry-card card-controller" id="cardController">
+                <div class="card-header">
+                    <span class="card-title" id="controllerTitle">VITESSE VIRTUELLE (ZWIFT COG)</span>
+                    <span class="card-badge helper-tv">Touches Télécommande: ▲ / ▼</span>
+                </div>
+                <div class="controller-action-row">
+                    <button class="ctrl-btn ctrl-down" id="btnCtrlDown" tabindex="9" title="Diminuer">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+
+                    <div class="controller-center-val">
+                        <span class="ctrl-huge-number" id="valTargetControl">V 12</span>
+                        <span class="ctrl-subtext" id="lblTargetControl">Ratio Moyen (Plat)</span>
+                    </div>
+
+                    <button class="ctrl-btn ctrl-up" id="btnCtrlUp" tabindex="10" title="Augmenter">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="18 15 12 9 6 15"></polyline>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="quick-preset-row" id="presetRow">
+                    <!-- Généré dynamiquement en fonction du mode -->
+                </div>
+            </div>
+        </section>
+
+        <!-- GRAPHIQUE EN DIRECT ET INFORMATIONS DE SESSION -->
+        <section class="live-graph-section">
+            <div class="graph-card">
+                <div class="graph-header">
+                    <div class="graph-title-group">
+                        <span class="graph-title">TÉLÉMÉTRIE EN DIRECT (PUISSANCE & CADENCE)</span>
+                        <span class="graph-legend">
+                            <span class="legend-dot dot-power"></span> Puissance (W)
+                            <span class="legend-dot dot-target"></span> Cible (W)
+                            <span class="legend-dot dot-cadence"></span> Cadence (RPM)
+                        </span>
+                    </div>
+                    <div class="timer-display">
+                        <span class="timer-icon">⏱️</span>
+                        <span id="sessionTimer">00:00:00</span>
+                    </div>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="liveChart" width="1200" height="240"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- BARRE DE CONTRÔLE DE SESSION (DÉMARRER / PAUSE / FIN) -->
+        <footer class="session-footer">
+            <div class="footer-left">
+                <button id="btnPlayPause" class="btn btn-action btn-play" tabindex="11">
+                    <span class="btn-icon-svg" id="playPauseIcon">▶</span>
+                    <span id="playPauseText">Démarrer Session</span>
+                </button>
+                <button id="btnReset" class="btn btn-secondary" tabindex="12">
+                    <span>↺</span> Réinitialiser
+                </button>
+            </div>
+
+            <div class="footer-center">
+                <div class="workout-selector-dropdown hidden" id="workoutSelectWrapper">
+                    <label for="workoutSelect" class="dropdown-label">Programme :</label>
+                    <select id="workoutSelect" class="custom-select" tabindex="13">
+                        <option value="warmup">Échauffement Pyramidal (12 min)</option>
+                        <option value="hiit">Fractionné Explosif 30/30 (15 min)</option>
+                        <option value="sweetspot">Sweet Spot / FTP Booster (25 min)</option>
+                        <option value="endurance">Endurance Fondamentale (30 min)</option>
+                        <option value="recovery">Récupération Active (10 min)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="footer-right">
+                <button id="btnExport" class="btn btn-export" tabindex="14" title="Télécharger le fichier Strava/GPX">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Exporter Séance (TCX Strava)
+                </button>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- ============================================================== -->
+    <!-- OVERLAY DU MONDE 3D ET DE LA COURSE CYCLISTE SUR GRAND ÉCRAN TV -->
+    <!-- ============================================================== -->
+    <div id="race3DOverlay" class="race-overlay hidden">
+        <!-- Conteneur WebGL Three.js plein écran -->
+        <div id="threeContainer" class="three-container"></div>
+
+        <!-- HUD EN DIRECT INCRUSTÉ STYLE BROADCAST TV / ZWIFT -->
+        <div class="race-hud-layer">
+            
+            <!-- HUD En-tête : Décors, Caméra & Pente -->
+            <div class="race-top-bar">
+                <div class="race-left-controls">
+                    <button id="btnExit3D" class="btn btn-hud" title="Revenir au tableau de bord" tabindex="101">
+                        ← Retour Tableau de bord
+                    </button>
+                    
+                    <div class="theme-select-group">
+                        <label for="selectStage" class="hud-label">Étape / Col :</label>
+                        <select id="selectStage" class="custom-select-hud" tabindex="102">
+                            <option value="alpedhuez">🏔️ Alpe d'Huez (13.8 km - D+ 1070m)</option>
+                            <option value="ventoux">💨 Mont Ventoux (21.5 km - D+ 1610m)</option>
+                            <option value="champselysees">🏛️ Paris Champs-Élysées (6.8 km)</option>
+                            <option value="nice">🌴 Promenade de Nice (10.0 km)</option>
+                        </select>
+                    </div>
+
+                    <button id="btnLoadGpx" class="btn btn-hud" title="Charger un tracé GPX de Strava ou Komoot" tabindex="103">
+                        📁 Importer GPX
+                    </button>
+                    <input type="file" id="inputGpx" accept=".gpx" style="display:none">
+
+                    <div class="theme-select-group">
+                        <label for="selectScenery" class="hud-label">Décor TV :</label>
+                        <select id="selectScenery" class="custom-select-hud" tabindex="104">
+                            <option value="alps">🏔️ Col des Alpes (Montagnes & Sapins)</option>
+                            <option value="coastal">🌊 Côte d'Azur (Bord de Mer & Palmiers)</option>
+                            <option value="cyberpunk">🌃 Criterium Cyberpunk (Nuit & Néons)</option>
+                            <option value="countryside">🌳 Campagne & Bocage Vert</option>
+                        </select>
+                    </div>
+
+                    <button id="btnSwitchCamera" class="btn btn-hud" title="Changer de vue (Touche C)" tabindex="105">
+                        🎥 <span id="lblCameraMode">Vue 3e Personne</span>
+                    </button>
+
+                    <div class="theme-select-group">
+                        <label for="selectDifficulty" class="hud-label">Difficulté Pente :</label>
+                        <select id="selectDifficulty" class="custom-select-hud" tabindex="106">
+                            <option value="100">100% (Réalisme Total)</option>
+                            <option value="75">75% (Sportif)</option>
+                            <option value="50">50% (Modéré)</option>
+                            <option value="25">25% (Facile)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Indicateur de Pente Dynamique de la route -->
+                <div class="slope-indicator-box" id="slopeIndicatorBox">
+                    <span class="slope-icon" id="slopeIcon">▲</span>
+                    <span class="slope-text" id="slopeText">+2.5 %</span>
+                    <span class="slope-tag" id="slopeDescText">Montée Active</span>
+                </div>
+
+                <!-- LEADERBOARD / CLASSEMENT EN DIRECT DE LA COURSE -->
+                <div class="race-leaderboard" id="raceLeaderboard">
+                    <div class="leaderboard-header">
+                        <span class="lb-title">CLASSEMENT COURSE</span>
+                        <span class="lb-badge" id="playerRankBadge">Position : 2e / 5</span>
+                    </div>
+                    <ul class="leaderboard-list" id="leaderboardList">
+                        <!-- Rempli en temps réel -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- BARRE DE PROFIL D'ÉTAPE & ALTIMÉTRIE -->
+            <div class="race-elevation-profile-bar">
+                <div class="elevation-info-row">
+                    <span class="elevation-label">PROFIL DU CIRCUIT & RELIEF (BOUCLE 5.0 KM)</span>
+                    <span class="elevation-status" id="elevationStatusText">Plat de la Vallée (Altitude : 12m)</span>
+                </div>
+                <div class="elevation-canvas-wrapper">
+                    <canvas id="elevationCanvas" width="900" height="50"></canvas>
+                </div>
+            </div>
+
+            <!-- HUD Bas : Cockpit Cycliste Géant & Lisible pour TV -->
+            <div class="race-bottom-cockpit">
+                
+                <!-- Carte Puissance -->
+                <div class="cockpit-card card-hud-power">
+                    <span class="cockpit-label">PUISSANCE</span>
+                    <div class="cockpit-val-group">
+                        <span class="cockpit-number" id="hudPower">0</span>
+                        <span class="cockpit-unit">W</span>
+                    </div>
+                    <span class="cockpit-sub" id="hudWkg">0.0 W/kg</span>
+                </div>
+
+                <!-- Carte Cadence -->
+                <div class="cockpit-card card-hud-cadence">
+                    <span class="cockpit-label">CADENCE</span>
+                    <div class="cockpit-val-group">
+                        <span class="cockpit-number" id="hudCadence">0</span>
+                        <span class="cockpit-unit">RPM</span>
+                    </div>
+                    <span class="cockpit-sub">Pédalage</span>
+                </div>
+
+                <!-- Carte Vitesse & Distance -->
+                <div class="cockpit-card card-hud-speed">
+                    <span class="cockpit-label">VITESSE</span>
+                    <div class="cockpit-val-group">
+                        <span class="cockpit-number" id="hudSpeed">0.0</span>
+                        <span class="cockpit-unit">KM/H</span>
+                    </div>
+                    <span class="cockpit-sub"><span id="hudDistance">0.00</span> km parcourus</span>
+                </div>
+
+                <!-- Carte Vitesse Virtuelle (Zwift Cog) -->
+                <div class="cockpit-card card-hud-gear">
+                    <span class="cockpit-label">VITESSE ZWIFT COG</span>
+                    <div class="cockpit-val-group">
+                        <span class="cockpit-number" id="hudGear">V 12</span>
+                    </div>
+                    <span class="cockpit-sub">Touches TV : ▲ / ▼</span>
+                </div>
+
+                <!-- Chronomètre de course -->
+                <div class="cockpit-card card-hud-time">
+                    <span class="cockpit-label">TEMPS ÉCOULÉ</span>
+                    <div class="cockpit-val-group">
+                        <span class="cockpit-number-small" id="hudTimer">00:00:00</span>
+                    </div>
+                    <span class="cockpit-sub">Boucle 5.0 km</span>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal Paramètres -->
+    <div id="settingsModal" class="modal-backdrop hidden">
+        <div class="modal-box">
+            <h2 class="modal-title">Profil Cycliste & Paramètres</h2>
+            <div class="form-group">
+                <label for="inputWeight">Poids du cycliste (kg) :</label>
+                <input type="number" id="inputWeight" value="75" min="30" max="150" class="modal-input">
+            </div>
+            <div class="form-group">
+                <label for="inputFtp">FTP estimée (Watts) :</label>
+                <input type="number" id="inputFtp" value="220" min="50" max="600" class="modal-input">
+            </div>
+            <div class="modal-actions">
+                <button id="btnSaveSettings" class="btn btn-primary">Enregistrer</button>
+                <button id="btnCloseSettings" class="btn btn-secondary">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts de l'application -->
+    <script src="three.min.js"></script>
+    <script src="audio.js"></script>
+    <script src="virtual_gears.js"></script>
+    <script src="workouts.js"></script>
+    <script src="gpx_parser.js"></script>
+    <script src="gamepad.js"></script>
+    <script src="ftms.js"></script>
+    <script src="export.js"></script>
+    <script src="world3d.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

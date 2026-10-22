@@ -1,0 +1,1131 @@
+/* --- FEUILLE DE STYLE MODERNE OPTIMISÉE ANDROID SMARTPHONE & ANDROID TV --- */
+:root {
+    --bg-primary: #0b0f19;
+    --bg-secondary: #131d31;
+    --bg-card: #1b2742;
+    --bg-card-hover: #233355;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-blue: #38bdf8;
+    --accent-indigo: #6366f1;
+    --accent-green: #22c55e;
+    --accent-orange: #f97316;
+    --accent-red: #ef4444;
+    --accent-yellow: #eab308;
+    --accent-purple: #a855f7;
+    --border-color: #2e3e60;
+    --focus-ring: #38bdf8;
+    --font-heading: 'Chakra Petch', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    user-select: none;
+}
+
+/* Accessibilité Android TV : surbrillance focus pour télécommande D-Pad */
+:focus-visible, button:focus, select:focus, input:focus {
+    outline: 4px solid var(--focus-ring) !important;
+    outline-offset: 3px !important;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.6) !important;
+    transform: scale(1.02);
+    transition: transform 0.15s ease, outline 0.15s ease;
+}
+
+/* En-tête Supérieur */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    background: rgba(19, 29, 49, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.brand-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.brand-icon {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #0284c7, #2563eb);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
+}
+
+.brand-icon svg {
+    width: 26px;
+    height: 26px;
+    stroke: white;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-name {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    background: linear-gradient(90deg, #38bdf8, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.brand-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.12);
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    width: fit-content;
+    margin-top: 2px;
+}
+
+/* Boutons et statut BLE */
+.connection-status-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-connect {
+    background: #0284c7;
+    color: white;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+
+.btn-connect:hover {
+    background: #0369a1;
+}
+
+.btn-connect.connected {
+    background: #059669;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-indicator.disconnected {
+    background-color: #ef4444;
+    box-shadow: 0 0 8px #ef4444;
+}
+
+.status-indicator.connected {
+    background-color: #22c55e;
+    box-shadow: 0 0 10px #22c55e;
+    animation: pulse 1.8s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.btn-secondary {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-card-hover);
+}
+
+.btn-icon {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.btn-icon:hover {
+    color: white;
+    background: var(--bg-card-hover);
+}
+
+/* Zone Principale */
+.dashboard-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 24px;
+    gap: 18px;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Sélecteur de modes */
+.mode-selector-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.mode-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.mode-btn:hover {
+    background: var(--bg-card);
+    border-color: #3b82f6;
+    color: var(--text-primary);
+}
+
+.mode-btn.active {
+    background: linear-gradient(145deg, #1e293b, #1d4ed8);
+    border-color: #60a5fa;
+    color: white;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+}
+
+.mode-icon {
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+}
+
+.mode-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 0.5px;
+}
+
+.mode-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.mode-btn.active .mode-sub {
+    color: #bfdbfe;
+}
+
+/* Bandeau d'intervalle Workout */
+.workout-progress-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.workout-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.interval-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--accent-blue);
+}
+
+.interval-timer {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--accent-orange);
+}
+
+.workout-progress-bar-bg {
+    width: 100%;
+    height: 10px;
+    background: #0f172a;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.workout-progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #38bdf8, #f59e0b);
+    transition: width 0.3s ease;
+}
+
+/* GRILLE DE TÉLÉMÉTRIE GÉANTE */
+.telemetry-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.telemetry-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    min-height: 180px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.telemetry-card:hover {
+    border-color: #3b82f6;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-title {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+}
+
+.card-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+}
+
+/* Affichage principal des chiffres géants */
+.card-main-val {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+    margin: 10px 0;
+}
+
+.number-display {
+    font-family: var(--font-heading);
+    font-size: 4.6rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #ffffff;
+    letter-spacing: -1px;
+}
+
+.unit-display {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+/* Couleurs personnalisées par carte */
+.card-power .number-display {
+    color: #38bdf8;
+    text-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+}
+
+.card-cadence .number-display {
+    color: #4ade80;
+    text-shadow: 0 0 25px rgba(74, 222, 128, 0.35);
+}
+
+.card-speed .number-display {
+    color: #fb923c;
+    text-shadow: 0 0 25px rgba(251, 146, 60, 0.35);
+}
+
+/* Sous-infos */
+.card-sub-info {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sub-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sub-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.sub-val {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Carte de Commande Active (Vitesses / ERG) */
+.card-controller {
+    background: linear-gradient(145deg, #1e293b, #0f172a);
+    border-color: #38bdf8;
+}
+
+.controller-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 8px 0;
+}
+
+.ctrl-btn {
+    width: 60px;
+    height: 60px;
+    background: #0284c7;
+    border: none;
+    border-radius: 14px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+    transition: all 0.15s ease;
+}
+
+.ctrl-btn svg {
+    width: 32px;
+    height: 32px;
+}
+
+.ctrl-btn:hover {
+    background: #0369a1;
+}
+
+.ctrl-btn:active {
+    transform: scale(0.92);
+}
+
+.controller-center-val {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ctrl-huge-number {
+    font-family: var(--font-heading);
+    font-size: 3.4rem;
+    font-weight: 700;
+    color: #facc15;
+    text-shadow: 0 0 20px rgba(250, 204, 21, 0.4);
+}
+
+.ctrl-subtext {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+.quick-preset-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.preset-chip {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.preset-chip:hover {
+    background: #38bdf8;
+    color: black;
+}
+
+/* SECTION GRAPHIQUE LIVE */
+.live-graph-section {
+    width: 100%;
+}
+
+.graph-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+.graph-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.graph-title-group {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.graph-title {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+}
+
+.graph-legend {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot-power { background-color: #38bdf8; }
+.dot-target { background-color: #facc15; }
+.dot-cadence { background-color: #4ade80; }
+
+.timer-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-heading);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: #0f172a;
+    padding: 6px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+
+.canvas-wrapper {
+    width: 100%;
+    height: 200px;
+    position: relative;
+    background: #0a0e17;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#liveChart {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* PIED DE PAGE & CONTRÔLE DE SESSION */
+.session-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 14px 20px;
+}
+
+.footer-left, .footer-center, .footer-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-action {
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: var(--font-heading);
+    border-radius: 12px;
+}
+
+.btn-play {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.btn-play:hover {
+    background: #059669;
+}
+
+.btn-pause {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+}
+
+.btn-export {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-export:hover {
+    background: #2563eb;
+}
+
+.custom-select {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.dropdown-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+/* MODAL */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-box {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 28px;
+    width: 90%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.modal-title {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    color: white;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.modal-input {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* RESPONSIVE SMARTPHONE & TV */
+@media (max-width: 1024px) {
+    .telemetry-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .mode-selector-bar {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .top-bar {
+        padding: 10px 14px;
+    }
+    .dashboard-container {
+        padding: 10px;
+        gap: 12px;
+    }
+    .telemetry-grid {
+        grid-template-columns: 1fr;
+    }
+    .number-display {
+        font-size: 3.6rem;
+    }
+    .mode-selector-bar {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .session-footer {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .footer-left, .footer-center, .footer-right {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ============================================================== */
+/* STYLES MODE COURSE 3D & DÉCORS TV (ZWIFT STYLE)               */
+/* ============================================================== */
+
+.btn-race {
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: glow-pulse 2.5s infinite;
+}
+
+@keyframes glow-pulse {
+    0% { box-shadow: 0 0 10px rgba(124, 58, 237, 0.4); }
+    50% { box-shadow: 0 0 25px rgba(124, 58, 237, 0.8); }
+    100% { box-shadow: 0 0 10px rgba(124, 58, 237, 0.4); }
+}
+
+.btn-race:hover {
+    background: linear-gradient(135deg, #6d28d9, #4338ca);
+}
+
+.race-icon {
+    font-size: 1.1rem;
+}
+
+/* Plein écran 3D */
+.race-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    z-index: 500;
+    overflow: hidden;
+}
+
+.three-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 501;
+}
+
+/* Incrustations HUD TV */
+.race-hud-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 510;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px;
+    pointer-events: none;
+}
+
+.race-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.race-left-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    pointer-events: auto;
+}
+
+.btn-hud {
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+}
+
+.btn-hud:hover {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: #38bdf8;
+}
+
+.theme-select-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(10px);
+    padding: 6px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hud-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.custom-select-hud {
+    background: #1e293b;
+    border: 1px solid var(--border-color);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Boîte Indicateur de Pente Dynamique */
+.slope-indicator-box {
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(15, 23, 42, 0.88);
+    backdrop-filter: blur(12px);
+    border: 2px solid #f59e0b;
+    padding: 8px 24px;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.35);
+}
+
+.slope-text {
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #facc15;
+    line-height: 1;
+}
+
+.slope-tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #cbd5e1;
+    margin-top: 2px;
+}
+
+/* Leaderboard Course en Direct */
+.race-leaderboard {
+    pointer-events: auto;
+    width: 280px;
+    background: rgba(15, 23, 42, 0.88);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+}
+
+.leaderboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 6px;
+}
+
+.lb-title {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #38bdf8;
+}
+
+.lb-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+    background: #0284c7;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.leaderboard-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.lb-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #e2e8f0;
+}
+
+.lb-item.is-player {
+    background: rgba(56, 189, 248, 0.25);
+    font-weight: 700;
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.5);
+}
+
+/* Profil Altimétrique D'Étape */
+.race-elevation-profile-bar {
+    width: 100%;
+    max-width: 950px;
+    margin: 0 auto 12px auto;
+    background: rgba(15, 23, 42, 0.88);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    padding: 8px 18px;
+    pointer-events: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.elevation-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.elevation-label {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #94a3b8;
+}
+
+.elevation-status {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #facc15;
+}
+
+.elevation-canvas-wrapper {
+    width: 100%;
+    height: 46px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(10, 14, 23, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#elevationCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* HUD Cockpit Bas */
+.race-bottom-cockpit {
+    pointer-events: auto;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.cockpit-card {
+    background: rgba(15, 23, 42, 0.88);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 12px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 160px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.35);
+}
+
+.cockpit-label {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #94a3b8;
+}
+
+.cockpit-val-group {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin: 2px 0;
+}
+
+.cockpit-number {
+    font-family: var(--font-heading);
+    font-size: 3.2rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.cockpit-number-small {
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1;
+    color: white;
+}
+
+.cockpit-unit {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+.cockpit-sub {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #cbd5e1;
+}
+
+.card-hud-power .cockpit-number {
+    color: #38bdf8;
+    text-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+}
+
+.card-hud-cadence .cockpit-number {
+    color: #4ade80;
+    text-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+}
+
+.card-hud-speed .cockpit-number {
+    color: #fb923c;
+    text-shadow: 0 0 20px rgba(251, 146, 60, 0.4);
+}
+
+.card-hud-gear .cockpit-number {
+    color: #facc15;
+    text-shadow: 0 0 20px rgba(250, 204, 21, 0.4);
+}
+
+@media (max-width: 900px) {
+    .race-bottom-cockpit {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .cockpit-card {
+        min-width: 120px;
+        padding: 8px 12px;
+    }
+    .cockpit-number {
+        font-size: 2.2rem;
+    }
+    .race-leaderboard {
+        display: none;
+    }
+}
+

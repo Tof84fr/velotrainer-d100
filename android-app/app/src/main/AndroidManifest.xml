@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Permissions Bluetooth (BLE) compatibles Android 8 à 14+ -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" tools:targetApi="s" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" tools:targetApi="s" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Compatibilité matérielle : indispensable pour fonctionner à la fois sur SMARTPHONE et ANDROID TV -->
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
+    <!-- L'écran tactile n'est PAS requis (permet l'installation sur Android TV / Google TV) -->
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <!-- Le mode Leanback n'est pas obligatoire afin d'autoriser aussi les téléphones -->
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:banner="@drawable/tv_banner"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.VeloTrainer">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="unspecified">
+            
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <!-- Lanceur Standard Téléphone & Tablette -->
+                <category android:name="android.intent.category.LAUNCHER" />
+                <!-- Lanceur Android TV / Google TV Leanback -->
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>

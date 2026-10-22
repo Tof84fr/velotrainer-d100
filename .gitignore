@@ -1,0 +1,18 @@
+# IDE
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Android / Gradle
+.gradle/
+**/.gradle/
+**/build/
+local.properties
+
+# Generated packages and installer outputs
+*.zip
+*.apk
+*.aab
