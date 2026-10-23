@@ -49,6 +49,7 @@ class NumberedCanvas(canvas.Canvas):
         self.restoreState()
 
 def create_manual_pdf(filename):
+    filename = str(filename)
     doc = SimpleDocTemplate(
         filename,
         pagesize=A4,
@@ -196,7 +197,7 @@ def create_manual_pdf(filename):
     story.append(Paragraph("1.2 Système de Vitesses Virtuelles (Pour le Zwift Cog)", style_h2))
     story.append(Paragraph("Votre home trainer étant la version <b>Zwift Edition</b>, il ne possède pas de cassette classique mais un <b>pignon unique de 14 dents</b>. Sans vitesses virtuelles, rouler sur un pignon fixe serait monotone et inconfortable :", style_body))
     story.append(Paragraph("• L'application embarque un <b>modèle mathématique à 24 rapports de transmission</b> (de V1 = rapport grimpeur 34x34 jusqu'à V24 = grand braquet de sprint 53x11).", style_bullet))
-    story.append(Paragraph("• Chaque passage de vitesse (via les flèches de la télécommande TV, l'écran ou une manette) recalcule instantanément l'effort requis selon l'équation physique cycliste :", style_body))
+    story.append(Paragraph("• Chaque passage de vitesse (via les touches Chaîne + / Chaîne − de la télécommande TV, l'écran ou une manette) recalcule instantanément l'effort requis selon l'équation physique cycliste :", style_body))
     story.append(Paragraph("<b>Puissance Cible = P_roulement + P_aérodynamique + P_gravité (Pente)</b>", ParagraphStyle('Formula', fontName='Helvetica-Bold', fontSize=9.5, alignment=1, textColor=colors.HexColor('#0369A1'), spaceBefore=4, spaceAfter=6)))
     story.append(Paragraph("• Un effet sonore mécanique de passage de vitesse (synthétisé via l'API Web Audio) procure un ressenti tactile immédiat à chaque changement de braquet.", style_bullet))
 
@@ -265,9 +266,10 @@ def create_manual_pdf(filename):
 
     remote_data = [
         [Paragraph("<b>Touche</b>", style_body_bold), Paragraph("<b>Action dans l'Application</b>", style_body_bold)],
-        [Paragraph("<b>Flèche HAUT (▲)</b>", style_body), Paragraph("Monter d'une vitesse virtuelle Zwift Cog (V1 à V24) / Augmenter les Watts en mode ERG", style_body)],
-        [Paragraph("<b>Flèche BAS (▼)</b>", style_body), Paragraph("Descendre d'une vitesse virtuelle (braquet plus souple pour la côte) / Réduire les Watts", style_body)],
-        [Paragraph("<b>Bouton OK / Centre</b>", style_body), Paragraph("Démarrer la séance ou mettre en Pause / Reprendre", style_body)],
+        [Paragraph("<b>Flèches directionnelles</b>", style_body), Paragraph("Naviguer entre les boutons et les menus ; elles ne changent pas les vitesses.", style_body)],
+        [Paragraph("<b>OK / Centre</b>", style_body), Paragraph("Activer l'élément sélectionné. Dans la course, utiliser « Démarrer séance » pour démarrer ou mettre en pause.", style_body)],
+        [Paragraph("<b>Chaîne + / CH +</b>", style_body), Paragraph("Monter d'une vitesse virtuelle ou augmenter la cible ERG / simulation.", style_body)],
+        [Paragraph("<b>Chaîne − / CH −</b>", style_body), Paragraph("Descendre d'une vitesse virtuelle ou réduire la cible ERG / simulation.", style_body)],
         [Paragraph("<b>Touche C</b>", style_body), Paragraph("Basculer la caméra : Vue Guidon (POV 1ère personne) ou Vue 3ème personne", style_body)],
         [Paragraph("<b>Touche R</b>", style_body), Paragraph("Ouvrir / Fermer le mode Course 3D plein écran", style_body)],
         [Paragraph("<b>Touche Retour</b>", style_body), Paragraph("Quitter la course 3D et revenir au tableau de bord des compteurs", style_body)]

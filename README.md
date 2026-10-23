@@ -2,7 +2,7 @@
 
 Application locale d'entraînement pour home trainer Van Rysel D100 Zwift Edition. Le projet comprend une application Web (PC, téléphone ou navigateur TV) et une application Android native pour connecter directement le home trainer en Bluetooth depuis Android TV.
 
-**APK Android TV :** [Télécharger VéloTrainer Android TV 1.0.0](https://github.com/Tof84fr/velotrainer-d100/raw/refs/heads/main/VeloTrainer-AndroidTV-1.0.0.apk) (6,7 Mo) — voir [l'installation pas à pas](#installer-lapk-sur-android-tv).
+**APK Android TV :** [Télécharger VéloTrainer Android TV 1.0.1](https://github.com/Tof84fr/velotrainer-d100/raw/refs/heads/main/VeloTrainer-AndroidTV-1.0.1.apk) (APK de débogage, version de télécommande) — voir [l'installation pas à pas](#installer-lapk-sur-android-tv).
 
 > **Projet indépendant :** VéloTrainer n'est pas affilié à Van Rysel, Decathlon ou Zwift. La compatibilité dépend du matériel et du navigateur/appareil utilisés.
 
@@ -115,7 +115,13 @@ Le dépôt ne contient pas de Gradle Wrapper. Android Studio doit donc fournir G
 
 ### Installer l'APK sur Android TV
 
-La version **1.0.0 pour Android TV** est disponible en **[téléchargement direct](https://github.com/Tof84fr/velotrainer-d100/raw/refs/heads/main/VeloTrainer-AndroidTV-1.0.0.apk)**. Cet APK est compilé en mode débogage pour simplifier l'installation sans Android Studio ; sa taille est d'environ **6,7 Mo**.
+La version **1.0.1 pour Android TV** est disponible en **[téléchargement direct](https://github.com/Tof84fr/velotrainer-d100/raw/refs/heads/main/VeloTrainer-AndroidTV-1.0.1.apk)**. Cet APK de débogage inclut la navigation par flèches et le changement de vitesse par les touches CH + / CH −.
+
+Empreinte SHA-256 de l'APK :
+
+```text
+16C73A41D813F9200DC47AA02EB451A732295671539B8D42D2B8C9C3E4E25701
+```
 
 1. Téléchargez l'APK depuis la page GitHub du projet, ou copiez-le sur une clé USB.
 2. Ouvrez le fichier sur la TV avec un gestionnaire de fichiers.
@@ -123,12 +129,6 @@ La version **1.0.0 pour Android TV** est disponible en **[téléchargement direc
 4. Ouvrez **VéloTrainer D100**, activez le Bluetooth et suivez les instructions [de connexion au D100](#connecter-le-home-trainer-en-bluetooth).
 
 Cet APK est un **build de débogage**, non une version publiée sur le Play Store. Android peut afficher un avertissement lors de l'installation. Pour créer vous-même un build, utilisez Android Studio en suivant les étapes ci-dessus. Une installation déjà signée avec une autre clé peut devoir être désinstallée avant d'installer cet APK.
-
-Empreinte SHA-256 de cet APK :
-
-```text
-E83D3295EAF871EAF5A153EF3B5751EC9A6E40ED218D523D92E11162C784A547
-```
 
 ## Architecture du projet
 
@@ -165,13 +165,13 @@ E83D3295EAF871EAF5A153EF3B5751EC9A6E40ED218D523D92E11162C784A547
 
 Dans l'application Web, les commandes disponibles dépendent de l'élément sélectionné :
 
-- **Vitesses virtuelles** : flèches haut/bas ou boutons dédiés pour changer le rapport virtuel.
+- **Vitesses virtuelles** : touches Chaîne + / − de la télécommande ou boutons dédiés pour changer le rapport virtuel. Les flèches directionnelles restent réservées à la navigation.
 - **Mode ERG** : ajuste une puissance cible.
 - **Simulation de pente** : ajuste la pente demandée au home trainer.
 - **Course 3D** : touches de caméra et contrôles affichés à l'écran.
 - **Séance** : démarrer, mettre en pause, réinitialiser et exporter.
 
-Dans l'application Android, utilisez les boutons à l'écran ou la télécommande. Les flèches haut/bas contrôlent le mode actif ; **OK/Centre** démarre ou met en pause la séance ; **Retour** ferme la vue 3D si elle est affichée.
+Dans l'application Android TV, les flèches directionnelles déplacent le focus entre les boutons et les menus, puis **OK/Centre** active l'élément sélectionné. Dans l'écran de course, sélectionnez **Démarrer séance** pour commencer ou mettre en pause. Les touches **Chaîne + / Chaîne −** changent les vitesses (ou ajustent la cible du mode actif). **Retour** ferme la vue 3D si elle est affichée.
 
 ## Dépannage
 

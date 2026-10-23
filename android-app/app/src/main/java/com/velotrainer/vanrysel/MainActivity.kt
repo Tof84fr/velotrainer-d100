@@ -8,7 +8,9 @@ import android.os.Handler
 import android.os.Looper
 import android.view.KeyEvent
 import android.view.View
+import android.webkit.JavascriptInterface
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -54,6 +56,7 @@ class MainActivity : AppCompatActivity() {
     private var distanceMeters = 0.0
     private var totalWattsAccumulator = 0L
     private var totalSecondsAccumulator = 0L
+    private var webPageLoaded = false
 
     private val timerHandler = Handler(Looper.getMainLooper())
     private val timerRunnable = object : Runnable {
@@ -109,12 +112,29 @@ class MainActivity : AppCompatActivity() {
             domStorageEnabled = true
             allowFileAccess = true
         }
+        web3DView.addJavascriptInterface(AndroidTrainerBridge(), "AndroidTrainerBridge")
+        web3DView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView, url: String) {
+                webPageLoaded = true
+                if (web3DView.visibility == View.VISIBLE) {
+                    focusWebCourseButton()
+                    syncWebGearDisplay()
+                    syncWebSessionState()
+                }
+            }
+        }
         web3DView.loadUrl("file:///android_asset/web/index.html")
+
+        btnOpen3D.post { btnOpen3D.requestFocus() }
     }
 
     private fun setupListeners() {
         btnOpen3D.setOnClickListener {
-            web3DView.visibility = if (web3DView.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+            if (web3DView.visibility == View.VISIBLE) {
+                hide3DView()
+            } else {
+                show3DView()
+            }
         }
 
         btnConnectTrainer.setOnClickListener {
@@ -201,24 +221,61 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // GESTION DES TOUCHES TÉLÉCOMMANDE ANDROID TV (D-PAD)
+    private fun show3DView() {
+        web3DView.visibility = View.VISIBLE
+        web3DView.isFocusable = true
+        web3DView.isFocusableInTouchMode = true
+        web3DView.requestFocus()
+        if (webPageLoaded) {
+            focusWebCourseButton()
+            syncWebGearDisplay()
+            syncWebSessionState()
+        }
+    }
+
+    private fun hide3DView() {
+        web3DView.visibility = View.GONE
+        btnOpen3D.requestFocus()
+    }
+
+    private fun focusWebCourseButton() {
+        web3DView.evaluateJavascript(
+            "var button = document.getElementById('btnToggle3D'); if (button) button.focus();",
+            null
+        )
+    }
+
+    private fun syncWebGearDisplay() {
+        if (!webPageLoaded || currentMode != "gear") return
+        web3DView.evaluateJavascript(
+            "if (window.app) window.app.setGearFromNative(${virtualGears.currentGear});",
+            null
+        )
+    }
+
+    private fun syncWebSessionState() {
+        if (!webPageLoaded) return
+        val isRunning = isSessionRunning
+        web3DView.evaluateJavascript(
+            "if (window.app) window.app.setNativeSessionRunning($isRunning);",
+            null
+        )
+    }
+
+    // Keep the D-pad for focus navigation; channel keys are reserved for workout controls.
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         return when (keyCode) {
-            KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_VOLUME_UP -> {
+            KeyEvent.KEYCODE_CHANNEL_UP -> {
                 handleActionUp()
                 true
             }
-            KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_VOLUME_DOWN -> {
+            KeyEvent.KEYCODE_CHANNEL_DOWN -> {
                 handleActionDown()
-                true
-            }
-            KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> {
-                togglePlayPause()
                 true
             }
             KeyEvent.KEYCODE_BACK -> {
                 if (web3DView.visibility == View.VISIBLE) {
-                    web3DView.visibility = View.GONE
+                    hide3DView()
                     true
                 } else {
                     super.onKeyDown(keyCode, event)
@@ -233,6 +290,7 @@ class MainActivity : AppCompatActivity() {
             "gear" -> {
                 virtualGears.shiftUp()
                 updateControlDisplay()
+                syncWebGearDisplay()
             }
             "erg" -> {
                 targetWatts = kotlin.math.min(600, targetWatts + 10)
@@ -252,6 +310,7 @@ class MainActivity : AppCompatActivity() {
             "gear" -> {
                 virtualGears.shiftDown()
                 updateControlDisplay()
+                syncWebGearDisplay()
             }
             "erg" -> {
                 targetWatts = kotlin.math.max(50, targetWatts - 10)
@@ -283,7 +342,7 @@ class MainActivity : AppCompatActivity() {
             "gear" -> {
                 tvControlTitle.text = "VITESSE VIRTUELLE (ZWIFT COG)"
                 tvControlVal.text = "V ${virtualGears.currentGear}"
-                tvControlSub.text = "Télécommande TV : Flèches ▲ / ▼"
+                tvControlSub.text = "Touches CH + / CH − : vitesses · Flèches : menus"
             }
             "erg" -> {
                 tvControlTitle.text = "MODE ERG (PUISSANCE CIBLE)"
@@ -309,6 +368,7 @@ class MainActivity : AppCompatActivity() {
             btnPlayPause.setBackgroundColor(0xFF10B981.toInt())
             timerHandler.removeCallbacks(timerRunnable)
         }
+        syncWebSessionState()
     }
 
     private fun resetSession() {
@@ -324,6 +384,7 @@ class MainActivity : AppCompatActivity() {
         updateTimerDisplay()
         tvDistance.text = "Distance : 0.00 km"
         tvWattsAvg.text = "Moyenne : 0 W"
+        syncWebSessionState()
     }
 
     private fun updateTimerDisplay() {
@@ -378,5 +439,12 @@ class MainActivity : AppCompatActivity() {
 
     private companion object {
         const val REQUEST_BLUETOOTH_PERMISSIONS = 101
+    }
+
+    private inner class AndroidTrainerBridge {
+        @JavascriptInterface
+        fun toggleSession() {
+            runOnUiThread { togglePlayPause() }
+        }
     }
 }

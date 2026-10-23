@@ -68,6 +68,7 @@ class AppController {
         this.race3DOverlay = document.getElementById('race3DOverlay');
         this.threeContainer = document.getElementById('threeContainer');
         this.btnExit3D = document.getElementById('btnExit3D');
+        this.btnRaceSession = document.getElementById('btnRaceSession');
         this.selectStage = document.getElementById('selectStage');
         this.btnLoadGpx = document.getElementById('btnLoadGpx');
         this.inputGpx = document.getElementById('inputGpx');
@@ -143,6 +144,9 @@ class AppController {
         if (this.btnExit3D) {
             this.btnExit3D.addEventListener('click', () => this.toggle3DMode(false));
         }
+        if (this.btnRaceSession) {
+            this.btnRaceSession.addEventListener('click', () => this.toggleRaceSession());
+        }
         if (this.btnLoadGpx && this.inputGpx) {
             this.btnLoadGpx.addEventListener('click', () => this.inputGpx.click());
             this.inputGpx.addEventListener('change', (e) => this.handleGpxFileUpload(e));
@@ -213,13 +217,12 @@ class AppController {
 
     // Gestion des touches de télécommande Android TV et clavier
     handleKeyboardAndTvRemote(e) {
-        // Flèche HAUT ou D-Pad HAUT : Vitesse supérieure / +Watts / +Pente
-        if (e.key === 'ArrowUp' || e.keyCode === 19 || e.keyCode === 38) {
+        // Les flèches restent disponibles pour naviguer dans les boutons et menus TV.
+        if (e.key === 'ChannelUp' || e.keyCode === 166) {
             e.preventDefault();
             this.handleActionUp();
         }
-        // Flèche BAS ou D-Pad BAS : Vitesse inférieure / -Watts / -Pente
-        else if (e.key === 'ArrowDown' || e.keyCode === 20 || e.keyCode === 40) {
+        else if (e.key === 'ChannelDown' || e.keyCode === 167) {
             e.preventDefault();
             this.handleActionDown();
         }
@@ -654,10 +657,34 @@ class AppController {
             if (window.cycling3DWorld && !window.cycling3DWorld.isActive) {
                 window.cycling3DWorld.init(this.threeContainer);
             }
+            requestAnimationFrame(() => this.btnExit3D?.focus());
             // Passer en plein écran automatiquement pour le confort TV
             this.toggleFullscreen();
         } else {
             this.race3DOverlay.classList.add('hidden');
+            this.btnToggle3D?.focus();
+        }
+    }
+
+    toggleRaceSession() {
+        if (window.AndroidTrainerBridge) {
+            window.AndroidTrainerBridge.toggleSession();
+        } else {
+            this.togglePlayPause();
+        }
+    }
+
+    setNativeSessionRunning(isRunning) {
+        if (this.btnRaceSession) {
+            this.btnRaceSession.textContent = isRunning ? '⏸ Pause séance' : '▶ Démarrer séance';
+        }
+    }
+
+    setGearFromNative(gear) {
+        window.virtualGears.setGear(gear);
+        this.updateControlDisplay();
+        if (this.hudGear) {
+            this.hudGear.textContent = `V ${window.virtualGears.currentGear}`;
         }
     }
 
@@ -730,6 +757,7 @@ class AppController {
                 window.ftmsDriver.startOrResumeSession();
             }
         }
+        this.setNativeSessionRunning(this.sessionState.isRunning && !this.sessionState.isPaused);
     }
 
     onSecondTick() {

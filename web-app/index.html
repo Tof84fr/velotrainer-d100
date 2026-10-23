@@ -274,10 +274,14 @@
                     <button id="btnExit3D" class="btn btn-hud" title="Revenir au tableau de bord" tabindex="101">
                         ← Retour Tableau de bord
                     </button>
+
+                    <button id="btnRaceSession" class="btn btn-hud" tabindex="102">
+                        ▶ Démarrer séance
+                    </button>
                     
                     <div class="theme-select-group">
                         <label for="selectStage" class="hud-label">Étape / Col :</label>
-                        <select id="selectStage" class="custom-select-hud" tabindex="102">
+                        <select id="selectStage" class="custom-select-hud" tabindex="103">
                             <option value="alpedhuez">🏔️ Alpe d'Huez (13.8 km - D+ 1070m)</option>
                             <option value="ventoux">💨 Mont Ventoux (21.5 km - D+ 1610m)</option>
                             <option value="champselysees">🏛️ Paris Champs-Élysées (6.8 km)</option>
@@ -285,14 +289,14 @@
                         </select>
                     </div>
 
-                    <button id="btnLoadGpx" class="btn btn-hud" title="Charger un tracé GPX de Strava ou Komoot" tabindex="103">
+                    <button id="btnLoadGpx" class="btn btn-hud" title="Charger un tracé GPX de Strava ou Komoot" tabindex="104">
                         📁 Importer GPX
                     </button>
                     <input type="file" id="inputGpx" accept=".gpx" style="display:none">
 
                     <div class="theme-select-group">
                         <label for="selectScenery" class="hud-label">Décor TV :</label>
-                        <select id="selectScenery" class="custom-select-hud" tabindex="104">
+                        <select id="selectScenery" class="custom-select-hud" tabindex="105">
                             <option value="alps">🏔️ Col des Alpes (Montagnes & Sapins)</option>
                             <option value="coastal">🌊 Côte d'Azur (Bord de Mer & Palmiers)</option>
                             <option value="cyberpunk">🌃 Criterium Cyberpunk (Nuit & Néons)</option>
@@ -300,13 +304,13 @@
                         </select>
                     </div>
 
-                    <button id="btnSwitchCamera" class="btn btn-hud" title="Changer de vue (Touche C)" tabindex="105">
+                    <button id="btnSwitchCamera" class="btn btn-hud" title="Changer de vue (Touche C)" tabindex="106">
                         🎥 <span id="lblCameraMode">Vue 3e Personne</span>
                     </button>
 
                     <div class="theme-select-group">
                         <label for="selectDifficulty" class="hud-label">Difficulté Pente :</label>
-                        <select id="selectDifficulty" class="custom-select-hud" tabindex="106">
+                        <select id="selectDifficulty" class="custom-select-hud" tabindex="107">
                             <option value="100">100% (Réalisme Total)</option>
                             <option value="75">75% (Sportif)</option>
                             <option value="50">50% (Modéré)</option>
@@ -384,7 +388,7 @@
                     <div class="cockpit-val-group">
                         <span class="cockpit-number" id="hudGear">V 12</span>
                     </div>
-                    <span class="cockpit-sub">Touches TV : ▲ / ▼</span>
+                    <span class="cockpit-sub">Rapports : Chaîne + / −</span>
                 </div>
 
                 <!-- Chronomètre de course -->

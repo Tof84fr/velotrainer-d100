@@ -1,4 +1,4 @@
-const CACHE_NAME = 'velotrainer-d100-v2';
+const CACHE_NAME = 'velotrainer-d100-v3';
 const ASSETS = [
   './',
   './index.html',

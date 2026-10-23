@@ -49,6 +49,7 @@ class NumberedCanvas(canvas.Canvas):
         self.restoreState()
 
 def create_guide_pdf(filename):
+    filename = str(filename)
     doc = SimpleDocTemplate(
         filename,
         pagesize=A4,
@@ -230,9 +231,10 @@ def create_guide_pdf(filename):
 
     remote_data = [
         [Paragraph("<b>Touche Télécommande</b>", style_body_bold), Paragraph("<b>Action dans l'Application VeloTrainer</b>", style_body_bold)],
-        [Paragraph("<b>Flèche HAUT (▲)</b>", style_body), Paragraph("Augmenter la vitesse virtuelle (Zwift Cog V1 à V24) / Augmenter les Watts (mode ERG) / Augmenter la pente (mode SIM).", style_body)],
-        [Paragraph("<b>Flèche BAS (▼)</b>", style_body), Paragraph("Réduire la vitesse virtuelle (braquet plus souple pour les côtes) / Diminuer les Watts / Diminuer la pente.", style_body)],
-        [Paragraph("<b>Bouton OK / Centre</b>", style_body), Paragraph("Démarrer le chrono d'entraînement ou Mettre en Pause / Reprendre la séance.", style_body)],
+        [Paragraph("<b>Flèches directionnelles</b>", style_body), Paragraph("Déplacer le focus dans les boutons et menus. Elles ne changent plus les vitesses.", style_body)],
+        [Paragraph("<b>OK / Centre</b>", style_body), Paragraph("Activer le bouton ou le menu sélectionné. Dans la course, utiliser le bouton « Démarrer séance » pour commencer ou mettre en pause.", style_body)],
+        [Paragraph("<b>Chaîne + / CH +</b>", style_body), Paragraph("Monter d'une vitesse virtuelle (Zwift Cog V1 à V24), ou augmenter la cible en modes ERG et Simulation.", style_body)],
+        [Paragraph("<b>Chaîne − / CH −</b>", style_body), Paragraph("Descendre d'une vitesse virtuelle, ou réduire la cible en modes ERG et Simulation.", style_body)],
         [Paragraph("<b>Touche RETOUR (Back)</b>", style_body), Paragraph("Fermer le mode Course 3D et revenir au tableau de bord des compteurs.", style_body)],
         [Paragraph("<b>Bouton 'Connecter Trainer'</b>", style_body), Paragraph("Démarre la recherche automatique Bluetooth FTMS du Van Rysel D100.", style_body)]
     ]
@@ -256,7 +258,7 @@ def create_guide_pdf(filename):
     story.append(Paragraph("• <b>Allumage du D100 :</b> Allumez votre home trainer Van Rysel D100 avant de cliquer sur 'Connecter Home Trainer' dans l'application.", style_bullet))
     story.append(Paragraph("• <b>Déconnexion Zwift/Kinomap :</b> Assurez-vous que le D100 n'est pas déjà connecté en Bluetooth à votre téléphone ou à une autre application. Le Bluetooth BLE ne permet qu'une seule connexion active à la fois.", style_bullet))
     story.append(Paragraph("• <b>Autorisation Appareils à proximité :</b> Lors du premier lancement sur la TV, acceptez la demande de permission Bluetooth / Appareils à proximité pour permettre au scan de détecter le D100.", style_bullet))
-    story.append(Paragraph("• <b>Mode Vitesse Virtuelle (Zwift Cog) :</b> En mode Vitesse Virtuelle, l'application ajuste automatiquement la résistance selon votre cadence et le rapport choisi (V1 à V24) pour simuler un vrai passage de vitesses !", style_bullet))
+    story.append(Paragraph("• <b>Mode Vitesse Virtuelle (Zwift Cog) :</b> Utilisez les touches Chaîne + / Chaîne − de la télécommande pour changer de rapport. Les flèches directionnelles restent disponibles pour naviguer dans les menus.", style_bullet))
 
     doc.build(story, canvasmaker=NumberedCanvas)
     print(f"PDF généré avec succès : {filename}")

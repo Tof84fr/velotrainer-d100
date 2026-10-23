@@ -16,4 +16,4 @@ local.properties
 *.zip
 *.apk
 *.aab
-!VeloTrainer-AndroidTV-debug.apk
+!VeloTrainer-AndroidTV-*.apk
