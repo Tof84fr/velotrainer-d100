@@ -2,7 +2,7 @@
 
 Application locale d'entraînement pour home trainer Van Rysel D100 Zwift Edition. Le projet comprend une application Web (PC, téléphone ou navigateur TV) et une application Android native pour connecter directement le home trainer en Bluetooth depuis Android TV.
 
-**APK Android TV :** [Télécharger directement VéloTrainer 1.0.0](https://github.com/Tof84fr/velotrainer-d100/raw/refs/heads/main/VeloTrainer-AndroidTV-debug.apk) (APK de débogage, 6,7 Mo) — voir [l'installation pas à pas](#installer-lapk-sur-android-tv).
+**APK Android TV :** [Télécharger VéloTrainer Android TV 1.0.0](https://github.com/Tof84fr/velotrainer-d100/raw/refs/heads/main/VeloTrainer-AndroidTV-1.0.0.apk) (6,7 Mo) — voir [l'installation pas à pas](#installer-lapk-sur-android-tv).
 
 > **Projet indépendant :** VéloTrainer n'est pas affilié à Van Rysel, Decathlon ou Zwift. La compatibilité dépend du matériel et du navigateur/appareil utilisés.
 
@@ -115,7 +115,7 @@ Le dépôt ne contient pas de Gradle Wrapper. Android Studio doit donc fournir G
 
 ### Installer l'APK sur Android TV
 
-Un APK de débogage précompilé est disponible en **[téléchargement direct](https://github.com/Tof84fr/velotrainer-d100/raw/refs/heads/main/VeloTrainer-AndroidTV-debug.apk)**. Il s'agit de la version **1.0.0**, générée à partir de ce projet pour simplifier l'installation sans Android Studio. Sa taille est d'environ **6,7 Mo**.
+La version **1.0.0 pour Android TV** est disponible en **[téléchargement direct](https://github.com/Tof84fr/velotrainer-d100/raw/refs/heads/main/VeloTrainer-AndroidTV-1.0.0.apk)**. Cet APK est compilé en mode débogage pour simplifier l'installation sans Android Studio ; sa taille est d'environ **6,7 Mo**.
 
 1. Téléchargez l'APK depuis la page GitHub du projet, ou copiez-le sur une clé USB.
 2. Ouvrez le fichier sur la TV avec un gestionnaire de fichiers.
