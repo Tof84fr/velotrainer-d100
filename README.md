@@ -1,6 +1,8 @@
 # VéloTrainer — Van Rysel D100
 
-Application locale d'entraînement pour home trainer Van Rysel D100 Zwift Edition. Le projet comprend une application Web (PC, téléphone ou navigateur TV) et une application Android native en cours de développement, notamment pour la connexion Bluetooth depuis Android TV.
+Application locale d'entraînement pour home trainer Van Rysel D100 Zwift Edition. Le projet comprend une application Web (PC, téléphone ou navigateur TV) et une application Android native pour connecter directement le home trainer en Bluetooth depuis Android TV.
+
+**APK Android TV :** [Télécharger VéloTrainer 1.0.0 (APK de débogage)](./VeloTrainer-AndroidTV-debug.apk) — voir [l'installation pas à pas](#installer-lapk-sur-android-tv).
 
 > **Projet indépendant :** VéloTrainer n'est pas affilié à Van Rysel, Decathlon ou Zwift. La compatibilité dépend du matériel et du navigateur/appareil utilisés.
 
@@ -12,6 +14,7 @@ Application locale d'entraînement pour home trainer Van Rysel D100 Zwift Editio
 - [Accéder à l'application depuis une TV](#accéder-à-lapplication-depuis-une-tv)
 - [Connecter le home trainer en Bluetooth](#connecter-le-home-trainer-en-bluetooth)
 - [Installer et compiler l'application Android](#installer-et-compiler-lapplication-android)
+- [Installer l'APK sur Android TV](#installer-lapk-sur-android-tv)
 - [Architecture du projet](#architecture-du-projet)
 - [Commandes et modes](#commandes-et-modes)
 - [Dépannage](#dépannage)
@@ -109,6 +112,23 @@ Le projet Android se trouve dans `android-app/`.
 5. Transférez l'APK sur l'appareil Android et installez-le. L'installation depuis une source inconnue peut nécessiter une autorisation dans Android TV.
 
 Le dépôt ne contient pas de Gradle Wrapper. Android Studio doit donc fournir Gradle pour synchroniser et compiler le projet.
+
+### Installer l'APK sur Android TV
+
+Un APK de débogage précompilé est disponible ici : **[VeloTrainer-AndroidTV-debug.apk](./VeloTrainer-AndroidTV-debug.apk)**. Il s'agit de la version **1.0.0**, générée à partir de ce projet pour simplifier l'installation sans Android Studio. Sa taille est d'environ **6,7 Mo**.
+
+1. Téléchargez l'APK depuis la page GitHub du projet, ou copiez-le sur une clé USB.
+2. Ouvrez le fichier sur la TV avec un gestionnaire de fichiers.
+3. Si Android TV le demande, autorisez temporairement ce gestionnaire à **installer des applications inconnues**, puis confirmez l'installation.
+4. Ouvrez **VéloTrainer D100**, activez le Bluetooth et suivez les instructions [de connexion au D100](#connecter-le-home-trainer-en-bluetooth).
+
+Cet APK est un **build de débogage**, non une version publiée sur le Play Store. Android peut afficher un avertissement lors de l'installation. Pour créer vous-même un build, utilisez Android Studio en suivant les étapes ci-dessus. Une installation déjà signée avec une autre clé peut devoir être désinstallée avant d'installer cet APK.
+
+Empreinte SHA-256 de cet APK :
+
+```text
+E83D3295EAF871EAF5A153EF3B5751EC9A6E40ED218D523D92E11162C784A547
+```
 
 ## Architecture du projet
 
