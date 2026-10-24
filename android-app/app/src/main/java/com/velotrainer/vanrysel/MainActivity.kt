@@ -1,7 +1,9 @@
 package com.velotrainer.vanrysel
 
 import android.Manifest
+import android.content.ActivityNotFoundException
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -9,18 +11,23 @@ import android.os.Looper
 import android.view.KeyEvent
 import android.view.View
 import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
 import android.webkit.WebView
+import android.webkit.WebChromeClient
 import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import org.json.JSONObject
 import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var ftmsManager: FtmsManager
+    private lateinit var clickManager: ZwiftClickManager
     private val virtualGears = VirtualGearSystem()
 
     // Vues
@@ -36,7 +43,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvControlVal: TextView
     private lateinit var tvControlSub: TextView
 
-    private lateinit var btnOpen3D: Button
     private lateinit var web3DView: WebView
     private lateinit var btnConnectTrainer: Button
     private lateinit var btnModeGear: Button
@@ -57,6 +63,17 @@ class MainActivity : AppCompatActivity() {
     private var totalWattsAccumulator = 0L
     private var totalSecondsAccumulator = 0L
     private var webPageLoaded = false
+    private var fileChooserCallback: ValueCallback<Array<Uri>>? = null
+    private val clickPressTimes = HashMap<ClickButton, Long>()
+    private val clickLongPressFired = HashSet<ClickButton>()
+
+    private val fileChooserLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            fileChooserCallback?.onReceiveValue(
+                WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data)
+            )
+            fileChooserCallback = null
+        }
 
     private val timerHandler = Handler(Looper.getMainLooper())
     private val timerRunnable = object : Runnable {
@@ -79,6 +96,9 @@ class MainActivity : AppCompatActivity() {
         ftmsManager = FtmsManager(this)
         setupFtmsCallbacks()
 
+        clickManager = ZwiftClickManager(this)
+        setupClickCallbacks()
+
         updateControlDisplay()
     }
 
@@ -95,7 +115,6 @@ class MainActivity : AppCompatActivity() {
         tvControlVal = findViewById(R.id.tvControlVal)
         tvControlSub = findViewById(R.id.tvControlSub)
 
-        btnOpen3D = findViewById(R.id.btnOpen3D)
         web3DView = findViewById(R.id.web3DView)
         btnConnectTrainer = findViewById(R.id.btnConnectTrainer)
         btnModeGear = findViewById(R.id.btnModeGear)
@@ -113,38 +132,42 @@ class MainActivity : AppCompatActivity() {
             allowFileAccess = true
         }
         web3DView.addJavascriptInterface(AndroidTrainerBridge(), "AndroidTrainerBridge")
+        web3DView.webChromeClient = object : WebChromeClient() {
+            override fun onShowFileChooser(
+                webView: WebView?,
+                filePathCallback: ValueCallback<Array<Uri>>?,
+                fileChooserParams: FileChooserParams?
+            ): Boolean {
+                if (filePathCallback == null || fileChooserParams == null) return false
+                this@MainActivity.fileChooserCallback?.onReceiveValue(null)
+                this@MainActivity.fileChooserCallback = filePathCallback
+                return try {
+                    fileChooserLauncher.launch(fileChooserParams.createIntent())
+                    true
+                } catch (error: ActivityNotFoundException) {
+                    this@MainActivity.fileChooserCallback?.onReceiveValue(null)
+                    this@MainActivity.fileChooserCallback = null
+                    Toast.makeText(this@MainActivity, "Aucun explorateur de fichiers disponible.", Toast.LENGTH_LONG).show()
+                    false
+                }
+            }
+        }
         web3DView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView, url: String) {
                 webPageLoaded = true
                 if (web3DView.visibility == View.VISIBLE) {
-                    focusWebCourseButton()
+                    focusWebConnectButton()
                     syncWebGearDisplay()
                     syncWebSessionState()
                 }
             }
         }
+        web3DView.visibility = View.VISIBLE
         web3DView.loadUrl("file:///android_asset/web/index.html")
-
-        btnOpen3D.post { btnOpen3D.requestFocus() }
+        web3DView.requestFocus()
     }
 
     private fun setupListeners() {
-        btnOpen3D.setOnClickListener {
-            if (web3DView.visibility == View.VISIBLE) {
-                hide3DView()
-            } else {
-                show3DView()
-            }
-        }
-
-        btnConnectTrainer.setOnClickListener {
-            if (ftmsManager.isConnected) {
-                ftmsManager.disconnect()
-            } else {
-                requestBluetoothPermissionsAndConnect()
-            }
-        }
-
         btnModeGear.setOnClickListener { setMode("gear") }
         btnModeErg.setOnClickListener { setMode("erg") }
         btnModeSim.setOnClickListener { setMode("sim") }
@@ -203,12 +226,26 @@ class MainActivity : AppCompatActivity() {
                         tvBluetoothStatus.text = "Home trainer déconnecté."
                     }
                 }
+                // Le Zwift Click est recherché dès que le home trainer est connecté
+                if (connected) clickManager.start() else clickManager.stop()
+                if (webPageLoaded) {
+                    web3DView.evaluateJavascript(
+                        "if(window.app) window.app.onNativeConnectionChanged($connected, ${JSONObject.quote(deviceName ?: "Van Rysel D100")});",
+                        null
+                    )
+                }
             }
         }
 
         ftmsManager.onStatusChanged = { status ->
             runOnUiThread {
                 tvBluetoothStatus.text = status
+                if (webPageLoaded) {
+                    web3DView.evaluateJavascript(
+                        "if(window.app) window.app.onNativeConnectionStatus(${JSONObject.quote(status)});",
+                        null
+                    )
+                }
                 if (!ftmsManager.isConnected) {
                     btnConnectTrainer.text = when {
                         status.startsWith("Recherche") -> "Recherche..."
@@ -221,26 +258,54 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun show3DView() {
-        web3DView.visibility = View.VISIBLE
-        web3DView.isFocusable = true
-        web3DView.isFocusableInTouchMode = true
-        web3DView.requestFocus()
-        if (webPageLoaded) {
-            focusWebCourseButton()
-            syncWebGearDisplay()
-            syncWebSessionState()
+    private fun setupClickCallbacks() {
+        clickManager.onStatusChanged = { status, connected ->
+            if (connected) Toast.makeText(this, status, Toast.LENGTH_SHORT).show()
+            if (webPageLoaded) {
+                web3DView.evaluateJavascript(
+                    "if(window.app) window.app.onZwiftClickStatus(${JSONObject.quote(status)}, $connected);",
+                    null
+                )
+            }
+        }
+        clickManager.onButtonChanged = { button, pressed -> onClickButtonChanged(button, pressed) }
+    }
+
+    // Appui court : action immédiate au relâchement ; appui long (0,8 s) : action secondaire
+    private fun onClickButtonChanged(button: ClickButton, pressed: Boolean) {
+        if (pressed) {
+            clickPressTimes[button] = System.currentTimeMillis()
+            clickLongPressFired.remove(button)
+            timerHandler.postDelayed({
+                val start = clickPressTimes[button] ?: return@postDelayed
+                if (System.currentTimeMillis() - start >= CLICK_LONG_PRESS_MS - 20) {
+                    clickLongPressFired.add(button)
+                    dispatchClickButton(button, true)
+                }
+            }, CLICK_LONG_PRESS_MS)
+        } else {
+            clickPressTimes.remove(button) ?: return
+            if (!clickLongPressFired.remove(button)) dispatchClickButton(button, false)
         }
     }
 
-    private fun hide3DView() {
-        web3DView.visibility = View.GONE
-        btnOpen3D.requestFocus()
+    private fun dispatchClickButton(button: ClickButton, longPress: Boolean) {
+        if (!webPageLoaded) {
+            if (!longPress) {
+                if (button == ClickButton.PLUS) handleActionUp() else handleActionDown()
+            }
+            return
+        }
+        val name = if (button == ClickButton.PLUS) "plus" else "minus"
+        web3DView.evaluateJavascript(
+            "if(window.app) window.app.onZwiftClickButton('$name', $longPress);",
+            null
+        )
     }
 
-    private fun focusWebCourseButton() {
+    private fun focusWebConnectButton() {
         web3DView.evaluateJavascript(
-            "var button = document.getElementById('btnToggle3D'); if (button) button.focus();",
+            "var button = document.getElementById('btnConnect'); if (button) button.focus();",
             null
         )
     }
@@ -274,8 +339,11 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             KeyEvent.KEYCODE_BACK -> {
-                if (web3DView.visibility == View.VISIBLE) {
-                    hide3DView()
+                if (web3DView.visibility == View.VISIBLE && ftmsManager.isConnected) {
+                    web3DView.evaluateJavascript(
+                        "if(window.app) window.app.showCourseMenu();",
+                        null
+                    )
                     true
                 } else {
                     super.onKeyDown(keyCode, event)
@@ -433,18 +501,40 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        clickManager.stop()
         ftmsManager.disconnect()
-        timerHandler.removeCallbacks(timerRunnable)
+        timerHandler.removeCallbacksAndMessages(null)
     }
 
     private companion object {
         const val REQUEST_BLUETOOTH_PERMISSIONS = 101
+        const val CLICK_LONG_PRESS_MS = 800L
     }
 
     private inner class AndroidTrainerBridge {
         @JavascriptInterface
         fun toggleSession() {
             runOnUiThread { togglePlayPause() }
+        }
+
+        @JavascriptInterface
+        fun connectTrainer() {
+            runOnUiThread { requestBluetoothPermissionsAndConnect() }
+        }
+
+        @JavascriptInterface
+        fun shiftUp() {
+            runOnUiThread { handleActionUp() }
+        }
+
+        @JavascriptInterface
+        fun shiftDown() {
+            runOnUiThread { handleActionDown() }
+        }
+
+        @JavascriptInterface
+        fun disconnectTrainer() {
+            runOnUiThread { ftmsManager.disconnect() }
         }
     }
 }

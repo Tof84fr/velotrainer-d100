@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="theme-dark">
+<body class="theme-dark awaiting-trainer">
     <!-- Barre Supérieure / En-tête -->
     <header class="top-bar">
         <div class="brand-group">
@@ -33,23 +33,9 @@
 
         <!-- Statut de Connexion BLE et Boutons d'Action -->
         <div class="connection-status-group">
-            <button id="btnToggle3D" class="btn btn-race" title="Basculer vers le Monde 3D & Course" tabindex="1">
-                <span class="race-icon">🏁</span> Course 3D & Décors TV
-            </button>
-
             <button id="btnConnect" class="btn btn-connect" tabindex="2">
                 <span class="status-indicator disconnected" id="bleIndicator"></span>
-                <span id="bleStatusText">Connecter Home Trainer</span>
-            </button>
-
-            <button id="btnDemo" class="btn btn-secondary" title="Tester sans home trainer" tabindex="3">
-                <span class="demo-icon">🎮</span> Mode Démo
-            </button>
-
-            <button id="btnFullscreen" class="btn btn-icon" title="Plein écran (Idéal TV)" tabindex="4">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
-                </svg>
+                <span id="bleStatusText">Connecter le home trainer</span>
             </button>
         </div>
     </header>
@@ -258,10 +244,35 @@
 
     </main>
 
+    <section id="courseMenuScreen" class="journey-screen course-menu-screen hidden" aria-labelledby="courseMenuTitle">
+        <div class="course-menu-card">
+            <h1 id="courseMenuTitle">Choisissez votre course</h1>
+            <label class="course-menu-label" for="selectStage">Parcours</label>
+            <select id="selectStage" class="custom-select-hud course-menu-select" tabindex="1">
+                <option value="alpedhuez">Alpe d'Huez - 13,8 km</option>
+                <option value="ventoux">Mont Ventoux - 21,5 km</option>
+                <option value="champselysees">Paris Champs-Élysées - 6,8 km</option>
+                <option value="nice">Promenade de Nice - 10 km</option>
+            </select>
+            <button id="btnLoadGpx" class="btn btn-secondary course-menu-button" type="button" tabindex="2">
+                Importer un parcours GPX
+            </button>
+            <input type="file" id="inputGpx" accept=".gpx" hidden>
+            <p id="courseMenuStatus" class="course-menu-status" aria-live="polite"></p>
+            <p id="clickStatus" class="course-menu-status click-status" aria-live="polite"></p>
+            <button id="btnStartCourse" class="btn btn-race course-menu-button" type="button" tabindex="3">
+                Lancer le parcours
+            </button>
+            <button id="btnDisconnect" class="course-menu-disconnect" type="button" tabindex="4">
+                Déconnecter le home trainer
+            </button>
+        </div>
+    </section>
+
     <!-- ============================================================== -->
     <!-- OVERLAY DU MONDE 3D ET DE LA COURSE CYCLISTE SUR GRAND ÉCRAN TV -->
     <!-- ============================================================== -->
-    <div id="race3DOverlay" class="race-overlay hidden">
+    <div id="race3DOverlay" class="race-overlay">
         <!-- Conteneur WebGL Three.js plein écran -->
         <div id="threeContainer" class="three-container"></div>
 
@@ -271,29 +282,14 @@
             <!-- HUD En-tête : Décors, Caméra & Pente -->
             <div class="race-top-bar">
                 <div class="race-left-controls">
-                    <button id="btnExit3D" class="btn btn-hud" title="Revenir au tableau de bord" tabindex="101">
-                        ← Retour Tableau de bord
+                    <button id="btnExit3D" class="btn btn-hud" title="Choisir un autre parcours" tabindex="101">
+                        ← Choisir un autre parcours
                     </button>
 
                     <button id="btnRaceSession" class="btn btn-hud" tabindex="102">
                         ▶ Démarrer séance
                     </button>
                     
-                    <div class="theme-select-group">
-                        <label for="selectStage" class="hud-label">Étape / Col :</label>
-                        <select id="selectStage" class="custom-select-hud" tabindex="103">
-                            <option value="alpedhuez">🏔️ Alpe d'Huez (13.8 km - D+ 1070m)</option>
-                            <option value="ventoux">💨 Mont Ventoux (21.5 km - D+ 1610m)</option>
-                            <option value="champselysees">🏛️ Paris Champs-Élysées (6.8 km)</option>
-                            <option value="nice">🌴 Promenade de Nice (10.0 km)</option>
-                        </select>
-                    </div>
-
-                    <button id="btnLoadGpx" class="btn btn-hud" title="Charger un tracé GPX de Strava ou Komoot" tabindex="104">
-                        📁 Importer GPX
-                    </button>
-                    <input type="file" id="inputGpx" accept=".gpx" style="display:none">
-
                     <div class="theme-select-group">
                         <label for="selectScenery" class="hud-label">Décor TV :</label>
                         <select id="selectScenery" class="custom-select-hud" tabindex="105">

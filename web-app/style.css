@@ -1025,6 +1025,134 @@ body {
     display: block;
 }
 
+body.awaiting-trainer .top-bar {
+    position: fixed;
+    inset: 0;
+    z-index: 520;
+    justify-content: center;
+    padding: 0;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.08), rgba(2, 6, 23, 0.28));
+    border: 0;
+    backdrop-filter: none;
+}
+
+body.awaiting-trainer .brand-group,
+body.awaiting-trainer #btnToggle3D,
+body.awaiting-trainer #btnDemo,
+body.awaiting-trainer #btnFullscreen {
+    display: none;
+}
+
+body.awaiting-trainer .connection-status-group {
+    justify-content: center;
+    margin: 0;
+}
+
+.launch-connect {
+    min-width: 300px;
+    min-height: 72px;
+    padding: 20px 30px;
+    font-size: 1.35rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(2, 132, 199, 0.55);
+}
+
+.journey-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 520;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    pointer-events: none;
+}
+
+.course-menu-screen {
+    background: rgba(2, 6, 23, 0.35);
+}
+
+.course-menu-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: min(520px, 100%);
+    padding: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 20px;
+    background: rgba(15, 23, 42, 0.94);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    pointer-events: auto;
+}
+
+.course-menu-card h1 {
+    margin-bottom: 8px;
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    color: var(--text-primary);
+}
+
+.course-menu-label {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.course-menu-select,
+.course-menu-button {
+    width: 100%;
+    min-height: 56px;
+    font-size: 1.1rem;
+}
+
+.course-menu-status {
+    min-height: 1.2em;
+    color: var(--text-secondary);
+}
+
+.click-status {
+    font-size: 0.9rem;
+}
+
+.click-status:empty {
+    display: none;
+}
+
+.click-status.connected {
+    color: #34d399;
+}
+
+.course-menu-disconnect {
+    align-self: center;
+    padding: 8px 12px;
+    border: 0;
+    background: transparent;
+    color: var(--text-secondary);
+    font: inherit;
+    cursor: pointer;
+}
+
+.course-menu-disconnect:hover {
+    color: var(--text-primary);
+}
+
+body.awaiting-trainer .dashboard-container,
+body.choosing-course .top-bar,
+body.choosing-course .dashboard-container,
+body.in-race .top-bar,
+body.in-race .dashboard-container {
+    display: none;
+}
+
+body.awaiting-trainer .race-hud-layer,
+body.choosing-course .race-hud-layer {
+    display: none;
+}
+
+body.in-race .race-hud-layer {
+    display: flex;
+}
+
 /* HUD Cockpit Bas */
 .race-bottom-cockpit {
     pointer-events: auto;
@@ -1128,4 +1256,3 @@ body {
         display: none;
     }
 }
-

@@ -2,7 +2,7 @@
 
 Application locale d'entraînement pour home trainer Van Rysel D100 Zwift Edition. Le projet comprend une application Web (PC, téléphone ou navigateur TV) et une application Android native pour connecter directement le home trainer en Bluetooth depuis Android TV.
 
-**APK Android TV :** [Télécharger VéloTrainer Android TV 1.0.1](https://github.com/Tof84fr/velotrainer-d100/raw/refs/heads/main/VeloTrainer-AndroidTV-1.0.1.apk) (APK de débogage, version de télécommande) — voir [l'installation pas à pas](#installer-lapk-sur-android-tv).
+**APK Android TV :** [Télécharger VéloTrainer Android TV 1.0.2](https://github.com/Tof84fr/velotrainer-d100/raw/refs/heads/main/VeloTrainer-AndroidTV-1.0.2-debug.apk) (APK de débogage, version de télécommande) — voir [l'installation pas à pas](#installer-lapk-sur-android-tv).
 
 > **Projet indépendant :** VéloTrainer n'est pas affilié à Van Rysel, Decathlon ou Zwift. La compatibilité dépend du matériel et du navigateur/appareil utilisés.
 
@@ -27,9 +27,9 @@ Application locale d'entraînement pour home trainer Van Rysel D100 Zwift Editio
 - Bluetooth LE FTMS pour recevoir les données du home trainer et, si l'appareil accepte les commandes FTMS, régler la résistance.
 - Vitesses virtuelles, mode ERG et simulation de pente.
 - Environnements 3D, caméra, concurrents virtuels et commandes clavier/manette dans la version Web.
-- Import de fichiers GPX et export d'activités TCX/CSV dans la version Web.
+- Import de fichiers GPX et export d'activités TCX/CSV dans la version Web et l'application Android TV.
 - Application Android Kotlin avec interface TV, commandes par télécommande, WebView 3D et gestion BLE native.
-- Mode Démo dans la version Web pour essayer l'interface sans home trainer.
+- Au lancement : paysage 3D et connexion au home trainer, puis choix du parcours avec import GPX.
 
 ## Quelle version utiliser ?
 
@@ -86,9 +86,9 @@ La connexion Web dépend de la prise en charge de **Web Bluetooth** par le navig
 1. Activez le Bluetooth dans les réglages de la TV.
 2. Branchez et allumez le D100.
 3. Fermez Zwift et toute autre application actuellement connectée au home trainer.
-4. Lancez VéloTrainer sur Android TV et sélectionnez **Connecter Home Trainer**.
+4. Lancez VéloTrainer sur Android TV et sélectionnez **Connecter le home trainer**.
 5. Accordez à l'application l'autorisation **Appareils à proximité** lorsqu'elle est demandée.
-6. Suivez le message d'état affiché pendant la recherche.
+6. Après la connexion, choisissez un parcours ou importez un fichier GPX.
 
 Le scan s'arrête après environ 20 secondes s'il ne trouve pas l'appareil. La présence d'une puce Bluetooth LE sur la TV est nécessaire. Le support du service FTMS et des commandes de résistance dépend également du micrologiciel du home trainer.
 
@@ -115,12 +115,12 @@ Le dépôt ne contient pas de Gradle Wrapper. Android Studio doit donc fournir G
 
 ### Installer l'APK sur Android TV
 
-La version **1.0.1 pour Android TV** est disponible en **[téléchargement direct](https://github.com/Tof84fr/velotrainer-d100/raw/refs/heads/main/VeloTrainer-AndroidTV-1.0.1.apk)**. Cet APK de débogage inclut la navigation par flèches et le changement de vitesse par les touches CH + / CH −.
+La version **1.0.2 pour Android TV** est disponible en **[téléchargement direct](https://github.com/Tof84fr/velotrainer-d100/raw/refs/heads/main/VeloTrainer-AndroidTV-1.0.2-debug.apk)**. Cet APK de débogage démarre sur le paysage 3D et la connexion au home trainer, propose ensuite le choix du parcours ou l'import GPX, et conserve la navigation par flèches et le changement de vitesse par les touches CH + / CH −.
 
 Empreinte SHA-256 de l'APK :
 
 ```text
-16C73A41D813F9200DC47AA02EB451A732295671539B8D42D2B8C9C3E4E25701
+72816155F04F47EC9EC08517858876A69E2F97E77825C85A1CC35F0319D4DA7D
 ```
 
 1. Téléchargez l'APK depuis la page GitHub du projet, ou copiez-le sur une clé USB.
@@ -171,7 +171,18 @@ Dans l'application Web, les commandes disponibles dépendent de l'élément sél
 - **Course 3D** : touches de caméra et contrôles affichés à l'écran.
 - **Séance** : démarrer, mettre en pause, réinitialiser et exporter.
 
-Dans l'application Android TV, les flèches directionnelles déplacent le focus entre les boutons et les menus, puis **OK/Centre** active l'élément sélectionné. Dans l'écran de course, sélectionnez **Démarrer séance** pour commencer ou mettre en pause. Les touches **Chaîne + / Chaîne −** changent les vitesses (ou ajustent la cible du mode actif). **Retour** ferme la vue 3D si elle est affichée.
+Dans l'application Android TV, les flèches directionnelles déplacent le focus entre les boutons et les menus, puis **OK/Centre** active l'élément sélectionné. Après avoir choisi un parcours, sélectionnez **Lancer le parcours**, puis **Démarrer séance** pour commencer ou mettre en pause. Les touches **Chaîne + / Chaîne −** changent les vitesses (ou ajustent la cible du mode actif). **Retour** ouvre le menu des parcours.
+
+### Zwift Click (Android TV)
+
+Une fois le home trainer connecté, l'application recherche automatiquement le Zwift Click. Appuyez sur l'un de ses boutons pour le réveiller ; un message confirme la connexion.
+
+| Écran | Appui court | Appui long (≈ 1 s) |
+|---|---|---|
+| Choix du parcours | **−** : élément suivant · **+** : valider (sur la liste : parcours suivant) | **+** : lancer le parcours · **−** : élément précédent |
+| Course | **+ / −** : vitesse supérieure / inférieure (ou cible du mode actif) | **+** : démarrer / mettre en pause · **−** : menu des parcours |
+
+Fermez Zwift sur les autres appareils : le Click ne peut être connecté qu'à une seule application à la fois.
 
 ## Dépannage
 

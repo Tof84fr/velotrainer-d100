@@ -9,9 +9,7 @@ class AppController {
             timerInterval: null,
             mode: 'gear', // 'gear', 'erg', 'sim', 'workout'
             targetWatts: 150,
-            targetGrade: 0.0,
-            isDemoMode: false,
-            demoInterval: null
+            targetGrade: 0.0
         };
 
         // Données instantanées et statistiques
@@ -41,6 +39,7 @@ class AppController {
         this.chartCanvas = null;
         this.chartCtx = null;
         this.is3DMode = false;
+        this.isTrainerConnected = false;
         this.trainerDifficulty = 100; // 100% de réalisme par défaut
 
         this.initDOMElements();
@@ -48,16 +47,20 @@ class AppController {
         this.setupChart();
         this.updateControlDisplay();
         this.requestWakeLock();
+        this.showConnectionScreen();
+        if (window.cycling3DWorld && !window.cycling3DWorld.isActive) {
+            window.cycling3DWorld.init(this.threeContainer);
+        }
+        if (window.cycling3DWorld && window.cycling3DWorld.cameraMode === 'chase') {
+            window.cycling3DWorld.toggleCameraMode();
+        }
     }
 
     initDOMElements() {
         // Boutons principaux
-        this.btnToggle3D = document.getElementById('btnToggle3D');
         this.btnConnect = document.getElementById('btnConnect');
         this.bleIndicator = document.getElementById('bleIndicator');
         this.bleStatusText = document.getElementById('bleStatusText');
-        this.btnDemo = document.getElementById('btnDemo');
-        this.btnFullscreen = document.getElementById('btnFullscreen');
         this.btnPlayPause = document.getElementById('btnPlayPause');
         this.playPauseIcon = document.getElementById('playPauseIcon');
         this.playPauseText = document.getElementById('playPauseText');
@@ -67,6 +70,11 @@ class AppController {
         // Éléments du Monde 3D & Course
         this.race3DOverlay = document.getElementById('race3DOverlay');
         this.threeContainer = document.getElementById('threeContainer');
+        this.courseMenuScreen = document.getElementById('courseMenuScreen');
+        this.courseMenuStatus = document.getElementById('courseMenuStatus');
+        this.clickStatus = document.getElementById('clickStatus');
+        this.btnStartCourse = document.getElementById('btnStartCourse');
+        this.btnDisconnect = document.getElementById('btnDisconnect');
         this.btnExit3D = document.getElementById('btnExit3D');
         this.btnRaceSession = document.getElementById('btnRaceSession');
         this.selectStage = document.getElementById('selectStage');
@@ -138,14 +146,17 @@ class AppController {
 
     bindEvents() {
         // Mode Course 3D
-        if (this.btnToggle3D) {
-            this.btnToggle3D.addEventListener('click', () => this.toggle3DMode(true));
-        }
         if (this.btnExit3D) {
-            this.btnExit3D.addEventListener('click', () => this.toggle3DMode(false));
+            this.btnExit3D.addEventListener('click', () => this.showCourseMenu());
         }
         if (this.btnRaceSession) {
             this.btnRaceSession.addEventListener('click', () => this.toggleRaceSession());
+        }
+        if (this.btnStartCourse) {
+            this.btnStartCourse.addEventListener('click', () => this.startCourse());
+        }
+        if (this.btnDisconnect) {
+            this.btnDisconnect.addEventListener('click', () => this.toggleBleConnection());
         }
         if (this.btnLoadGpx && this.inputGpx) {
             this.btnLoadGpx.addEventListener('click', () => this.inputGpx.click());
@@ -171,12 +182,6 @@ class AppController {
 
         // Connexion BLE
         this.btnConnect.addEventListener('click', () => this.toggleBleConnection());
-
-        // Mode Démo
-        this.btnDemo.addEventListener('click', () => this.toggleDemoMode());
-
-        // Plein écran (TV & mobile)
-        this.btnFullscreen.addEventListener('click', () => this.toggleFullscreen());
 
         // Session Play / Pause
         this.btnPlayPause.addEventListener('click', () => this.togglePlayPause());
@@ -238,11 +243,6 @@ class AppController {
         else if (e.key === 'c' || e.key === 'C') {
             e.preventDefault();
             this.switchCamera();
-        }
-        // Touche R : Bascule rapide Course 3D
-        else if (e.key === 'r' || e.key === 'R') {
-            e.preventDefault();
-            this.toggle3DMode(!this.is3DMode);
         }
     }
 
@@ -376,7 +376,7 @@ class AppController {
 
     // Synchronisation de la résistance selon le mode
     syncTrainerResistance() {
-        if (!this.sessionState.isRunning && !this.sessionState.isDemoMode) return;
+        if (!this.sessionState.isRunning) return;
 
         // Calcul de la pente active (asservie au monde 3D si ouvert, avec réglage de difficulté)
         let activeSlope = 0.0;
@@ -406,6 +406,10 @@ class AppController {
         this.metrics.power = data.powerWatts;
         this.metrics.cadence = data.cadenceRpm;
         this.metrics.speed = data.speedKmh;
+        if (window.cycling3DWorld) {
+            window.cycling3DWorld.updatePlayerSpeed(data.speedKmh);
+            window.cycling3DWorld.updatePlayerCadence(data.cadenceRpm);
+        }
 
         if (this.sessionState.isRunning) {
             // Mettre à jour les stats
@@ -531,9 +535,6 @@ class AppController {
         this.hudTimer.textContent = this.formatSeconds(this.sessionState.elapsedSeconds);
 
         if (window.cycling3DWorld) {
-            // Transmettre la vitesse réelle au monde 3D
-            window.cycling3DWorld.updatePlayerSpeed(this.metrics.speed);
-
             // Mettre à jour l'indicateur de pente et la description
             const slope = window.cycling3DWorld.currentSlope || 0.0;
             const effectiveSlope = slope * (this.trainerDifficulty / 100.0);
@@ -649,21 +650,104 @@ class AppController {
         this.leaderboardList.innerHTML = html;
     }
 
-    // Basculer vers le Monde 3D Plein Écran
-    toggle3DMode(enable) {
-        this.is3DMode = enable;
-        if (enable) {
-            this.race3DOverlay.classList.remove('hidden');
-            if (window.cycling3DWorld && !window.cycling3DWorld.isActive) {
-                window.cycling3DWorld.init(this.threeContainer);
-            }
-            requestAnimationFrame(() => this.btnExit3D?.focus());
-            // Passer en plein écran automatiquement pour le confort TV
-            this.toggleFullscreen();
-        } else {
-            this.race3DOverlay.classList.add('hidden');
-            this.btnToggle3D?.focus();
+    showConnectionScreen() {
+        this.is3DMode = false;
+        document.body.classList.remove('choosing-course', 'in-race');
+        document.body.classList.add('awaiting-trainer');
+        this.courseMenuScreen.classList.add('hidden');
+        requestAnimationFrame(() => this.btnConnect?.focus());
+    }
+
+    showCourseMenu() {
+        if (!this.isTrainerConnected) return;
+        this.is3DMode = false;
+        document.body.classList.remove('awaiting-trainer', 'in-race');
+        document.body.classList.add('choosing-course');
+        this.courseMenuScreen.classList.remove('hidden');
+        requestAnimationFrame(() => this.selectStage?.focus());
+    }
+
+    startCourse() {
+        if (!this.isTrainerConnected) {
+            this.showConnectionScreen();
+            return;
         }
+        if (window.cycling3DWorld && window.cycling3DWorld.cameraMode === 'pov') {
+            window.cycling3DWorld.toggleCameraMode();
+            if (this.lblCameraMode) this.lblCameraMode.textContent = "Vue 3e Personne";
+        }
+        this.is3DMode = true;
+        this.courseMenuScreen.classList.add('hidden');
+        document.body.classList.remove('awaiting-trainer', 'choosing-course');
+        document.body.classList.add('in-race');
+        requestAnimationFrame(() => this.btnRaceSession?.focus());
+    }
+
+    handleBackNavigation() {
+        if (!this.isTrainerConnected) return false;
+        this.showCourseMenu();
+        return true;
+    }
+
+    // Boutons du Zwift Click (application Android) :
+    // menu → − : élément suivant, + : valider, appui long − : élément précédent, appui long + : lancer le parcours
+    // course → + / − : vitesses, appui long + : démarrer/pause, appui long − : menu des parcours
+    onZwiftClickButton(button, longPress) {
+        const isPlus = button === 'plus';
+        if (document.body.classList.contains('choosing-course')) {
+            if (isPlus && longPress) {
+                this.startCourse();
+            } else if (isPlus) {
+                this.activateCourseMenuItem();
+            } else {
+                this.moveCourseMenuFocus(longPress ? -1 : 1);
+            }
+        } else if (document.body.classList.contains('in-race')) {
+            if (longPress) {
+                if (isPlus) this.toggleRaceSession();
+                else this.showCourseMenu();
+            } else if (window.AndroidTrainerBridge) {
+                if (isPlus) window.AndroidTrainerBridge.shiftUp();
+                else window.AndroidTrainerBridge.shiftDown();
+            } else if (isPlus) {
+                this.handleActionUp();
+            } else {
+                this.handleActionDown();
+            }
+        }
+    }
+
+    courseMenuItems() {
+        return [this.selectStage, this.btnLoadGpx, this.btnStartCourse, this.btnDisconnect].filter(Boolean);
+    }
+
+    moveCourseMenuFocus(step) {
+        const items = this.courseMenuItems();
+        const current = items.indexOf(document.activeElement);
+        const next = current < 0 ? 0 : (current + step + items.length) % items.length;
+        items[next].focus();
+    }
+
+    activateCourseMenuItem() {
+        const focused = document.activeElement;
+        if (focused === this.selectStage) {
+            // Sur la liste des parcours, + passe au parcours suivant
+            const count = this.selectStage.options.length;
+            this.selectStage.selectedIndex = (this.selectStage.selectedIndex + 1) % count;
+            this.selectStage.dispatchEvent(new Event('change'));
+        } else if (this.courseMenuItems().includes(focused)) {
+            focused.click();
+        } else {
+            this.moveCourseMenuFocus(1);
+        }
+    }
+
+    onZwiftClickStatus(status, connected) {
+        if (!this.clickStatus) return;
+        this.clickStatus.textContent = connected
+            ? "Zwift Click connecté — − : suivant · + : valider · appui long + : lancer"
+            : status;
+        this.clickStatus.classList.toggle('connected', !!connected);
     }
 
     toggleRaceSession() {
@@ -675,6 +759,14 @@ class AppController {
     }
 
     setNativeSessionRunning(isRunning) {
+        this.sessionState.isRunning = isRunning;
+        this.sessionState.isPaused = false;
+        if (isRunning && !this.sessionState.timerInterval) {
+            this.sessionState.timerInterval = setInterval(() => this.onSecondTick(), 1000);
+        } else if (!isRunning && this.sessionState.timerInterval) {
+            clearInterval(this.sessionState.timerInterval);
+            this.sessionState.timerInterval = null;
+        }
         if (this.btnRaceSession) {
             this.btnRaceSession.textContent = isRunning ? '⏸ Pause séance' : '▶ Démarrer séance';
         }
@@ -696,6 +788,20 @@ class AppController {
             if (this.elevationStatusText) {
                 this.elevationStatusText.textContent = `${stage.name} (${stage.distanceKm} km)`;
             }
+            if (this.courseMenuStatus && !this.inputGpx.files.length) {
+                this.courseMenuStatus.textContent = stage.name;
+            }
+            const sceneryByStage = {
+                alpedhuez: 'alps',
+                ventoux: 'alps',
+                champselysees: 'countryside',
+                nice: 'coastal'
+            };
+            const scenery = sceneryByStage[stageId];
+            if (scenery && window.cycling3DWorld) {
+                this.selectScenery.value = scenery;
+                window.cycling3DWorld.setTheme(scenery);
+            }
             if (window.sounds) window.sounds.playStart();
         }
     }
@@ -709,10 +815,12 @@ class AppController {
             const content = e.target.result;
             const track = window.gpxEngine.parseGpxText(content);
             if (track) {
-                alert(`Tracé GPX chargé : ${track.name} (${track.distanceKm} km, ${track.points.length} points) !`);
+                this.courseMenuStatus.textContent = `Tracé importé : ${track.name} (${track.distanceKm} km)`;
                 if (this.elevationStatusText) {
                     this.elevationStatusText.textContent = `${track.name} (${track.distanceKm} km)`;
                 }
+            } else {
+                this.courseMenuStatus.textContent = "Le fichier GPX n'a pas pu être lu.";
             }
         };
         reader.readAsText(file);
@@ -835,6 +943,16 @@ class AppController {
 
     // Gestion de la connexion BLE
     async toggleBleConnection() {
+        if (window.AndroidTrainerBridge) {
+            if (this.isTrainerConnected) {
+                window.AndroidTrainerBridge.disconnectTrainer();
+            } else {
+                this.onNativeConnectionStatus("Recherche du home trainer...");
+                window.AndroidTrainerBridge.connectTrainer();
+            }
+            return;
+        }
+
         if (!window.ftmsDriver.isConnected) {
             try {
                 this.bleStatusText.textContent = "Recherche BLE...";
@@ -849,53 +967,27 @@ class AppController {
     }
 
     onBleConnectionChanged(connected, name) {
+        this.isTrainerConnected = connected;
         if (connected) {
             this.bleIndicator.className = "status-indicator connected";
             this.bleStatusText.textContent = name || "Van Rysel D100 Connecté";
             this.btnConnect.classList.add('connected');
+            this.showCourseMenu();
         } else {
             this.bleIndicator.className = "status-indicator disconnected";
-            this.bleStatusText.textContent = "Connecter Home Trainer";
+            this.bleStatusText.textContent = "Connecter le home trainer";
             this.btnConnect.classList.remove('connected');
+            this.showConnectionScreen();
         }
     }
 
-    // Mode Démo pour tester l'application sans home trainer allumé
-    toggleDemoMode() {
-        this.sessionState.isDemoMode = !this.sessionState.isDemoMode;
+    onNativeConnectionChanged(connected, name) {
+        this.onBleConnectionChanged(connected, name);
+    }
 
-        if (this.sessionState.isDemoMode) {
-            this.btnDemo.style.background = "#059669";
-            this.btnDemo.innerHTML = "<span>🎮</span> Démo Active";
-
-            let simCadence = 85;
-            let simPower = 175;
-
-            this.sessionState.demoInterval = setInterval(() => {
-                // Variations réalistes
-                simCadence += (Math.random() - 0.5) * 3;
-                simCadence = Math.max(70, Math.min(105, simCadence));
-
-                let target = this.sessionState.targetWatts;
-                if (this.sessionState.mode === 'gear') {
-                    const r = window.virtualGears.computeResistance(simCadence, this.userProfile.weightKg);
-                    target = r.targetPower;
-                }
-                simPower += (target - simPower) * 0.2 + (Math.random() - 0.5) * 6;
-
-                const speed = (simCadence * 0.35).toFixed(1);
-
-                this.onTrainerDataReceived({
-                    powerWatts: Math.round(simPower),
-                    cadenceRpm: Math.round(simCadence),
-                    speedKmh: parseFloat(speed),
-                    distanceMeters: this.metrics.distance * 1000
-                });
-            }, 1000);
-        } else {
-            this.btnDemo.style.background = "";
-            this.btnDemo.innerHTML = "<span>🎮</span> Mode Démo";
-            clearInterval(this.sessionState.demoInterval);
+    onNativeConnectionStatus(status) {
+        if (!this.isTrainerConnected) {
+            this.bleStatusText.textContent = status;
         }
     }
 
@@ -971,15 +1063,6 @@ class AppController {
             else ctx.lineTo(x, y);
         });
         ctx.stroke();
-    }
-
-    // Basculer en mode Plein Écran
-    toggleFullscreen() {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(e => console.log(e));
-        } else {
-            if (document.exitFullscreen) document.exitFullscreen();
-        }
     }
 
     // WakeLock pour garder l'écran allumé pendant la séance de vélo
